@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainBluetooth" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <ToggleButton
+            android:id="@+id/tg_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:textColor="#FFFFFF"
+           	android:gravity="fill"
+            android:onClick="click" />
+
+        <Button
+            android:id="@+id/bt_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="discoverDevices"
+            android:text="search devices"
+            android:gravity="fill"
+            android:textAllCaps="true"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTitleListPaired"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvTitleListAvailable"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_marginTop="29dp"
+        android:text="List of paired devices:"
+        android:textAllCaps="true"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerPaired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvTitleListPaired"
+        android:layout_alignRight="@+id/linearLayout1"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_toRightOf="@+id/tvTitleListAvailable"
+        android:background="#3D393A"
+        android:dropDownSelector="#FFFFFF"
+        android:popupBackground="#FFFFFF" />
+
+    <Spinner
+        android:id="@+id/spinnerAvailable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spinnerPaired"
+        android:layout_alignRight="@+id/spinnerPaired"
+        android:layout_below="@+id/spinnerPaired"
+        android:layout_marginTop="13dp"
+        android:dropDownSelector="#FFFFFF"
+        android:popupBackground="#FFFFFF"
+        android:background="#3D393A" />
+
+    <TextView
+        android:id="@+id/tvTitleListAvailable"
+        android:layout_width="202dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/spinnerAvailable"
+        android:layout_alignLeft="@+id/linearLayout1"
+        android:layout_marginBottom="22dp"
+        android:text="List of available devices:"
+        android:textAllCaps="true"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/ligardisp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/tvTitleListPaired"
+        android:layout_below="@+id/tvTitleListAvailable"
+        android:layout_marginTop="47dp"
+        android:onClick="ligarDispositivo"
+        android:text="Connect!" />
+
+</RelativeLayout>
