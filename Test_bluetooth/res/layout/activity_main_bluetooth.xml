@@ -42,43 +42,7 @@
         android:layout_alignLeft="@+id/tvTitleListAvailable"
         android:layout_below="@+id/linearLayout1"
         android:layout_marginTop="29dp"
-        android:text="List of paired devices:"
-        android:textAllCaps="true"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold" />
-
-    <Spinner
-        android:id="@+id/spinnerPaired"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tvTitleListPaired"
-        android:layout_alignRight="@+id/linearLayout1"
-        android:layout_below="@+id/linearLayout1"
-        android:layout_toRightOf="@+id/tvTitleListAvailable"
-        android:background="#3D393A"
-        android:dropDownSelector="#FFFFFF"
-        android:popupBackground="#FFFFFF" />
-
-    <Spinner
-        android:id="@+id/spinnerAvailable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/spinnerPaired"
-        android:layout_alignRight="@+id/spinnerPaired"
-        android:layout_below="@+id/spinnerPaired"
-        android:layout_marginTop="13dp"
-        android:dropDownSelector="#FFFFFF"
-        android:popupBackground="#FFFFFF"
-        android:background="#3D393A" />
-
-    <TextView
-        android:id="@+id/tvTitleListAvailable"
-        android:layout_width="202dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/spinnerAvailable"
-        android:layout_alignLeft="@+id/linearLayout1"
-        android:layout_marginBottom="22dp"
-        android:text="List of available devices:"
+        android:text="Paired devices:"
         android:textAllCaps="true"
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
@@ -92,5 +56,36 @@
         android:layout_marginTop="47dp"
         android:onClick="ligarDispositivo"
         android:text="Connect!" />
+
+    <Spinner
+        android:id="@+id/spinnerAvailable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spinnerPaired"
+        android:layout_centerVertical="true"
+        android:background="#3D393A"
+        android:dropDownSelector="#FFFFFF"
+        android:popupBackground="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/tvTitleListAvailable"
+        android:layout_width="202dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/linearLayout1"
+        android:layout_centerVertical="true"
+        android:text="Available devices:"
+        android:textAllCaps="true"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerPaired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_toRightOf="@+id/tvTitleListPaired"
+        android:background="#3D393A"
+        android:dropDownSelector="#FFFFFF"
+        android:popupBackground="#FFFFFF" />
 
 </RelativeLayout>

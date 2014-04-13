@@ -60,7 +60,5 @@ BluetoothAdapter mBluetoothAdapter;
 	 mBluetoothAdapter.startDiscovery();
 	 //eliminar lista para no acarrear en cada busqueda
 	 aArrayListAvailable.clear();
-	
-	
 	}
 }

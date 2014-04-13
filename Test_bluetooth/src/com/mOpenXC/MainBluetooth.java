@@ -35,6 +35,7 @@ public class MainBluetooth extends Activity {
 	private ArrayList<String> mArrayListAvailable;
 	private ArrayAdapter<String> madapterAvailable;
 	private ArrayList<BluetoothDevice> devices;
+	private BluetoothDevice[] pairedDevicesArray;
 
 	@Override
 	//inicializar variables en OnCreate
@@ -64,8 +65,12 @@ public class MainBluetooth extends Activity {
 		 lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		 lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
 		 //lIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		 registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-		 //registerReceiver(mReceiver, lIntentFilter);
+		 //registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+		 registerReceiver(mReceiver, lIntentFilter);
+		 
+		 //comprobamos estado bluettoth para dejar el boton en el mismo estado
+			 
+		 
 	}
 
 	@Override
@@ -119,7 +124,7 @@ public class MainBluetooth extends Activity {
 				}
 			}
 			//cuando encuentra un dispositivo
-			//if (BluetoothDevice.ACTION_FOUND.equals(action)){
+			if (BluetoothDevice.ACTION_FOUND.equals(action)){
 				// Get the BluetoothDevice object from the Intent
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				Log.i("Dispositivo encontrado", devices.toString());
@@ -133,7 +138,7 @@ public class MainBluetooth extends Activity {
 				
 				madapterAvailable = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_spinner_item, mArrayListAvailable);
 				mSpinnerAvailable.setAdapter(madapterAvailable);
-			//}
+			}
 			//si termina de descubrir dispositivos
 			/*if(action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)){
 				//apaga bluetooth
@@ -145,26 +150,34 @@ public class MainBluetooth extends Activity {
 	};
 	
 	public void ligarDispositivo(View view){
-		if (devices.size() == 0)
+		
+		if (devices.size() == 0){
+			Log.i("Lista","ERROR :Lista vacia ");
 			return;
+		}
+			
 		if (mBluetoothAdapter.isDiscovering()){
 			mBluetoothAdapter.cancelDiscovery();
 		}
-		int pos = mSpinnerAvailable.getSelectedItemPosition();
-			Log.i("Lista", devices.toString());
-		//si los dispositivos no son paired
-		if(devices.get(pos).getBondState() == BluetoothDevice.BOND_NONE){
-			Log.d(TAG,devices.get(pos).toString());
-			mBluetoothConnect = new BluetoothConnect(devices.get(pos));
+		int posAvailable = mSpinnerAvailable.getSelectedItemPosition();
+		Log.i("Lista", devices.toString());
+		
+		//if the devices are not  paired
+		if(devices.get(posAvailable).getBondState() == BluetoothDevice.BOND_NONE){
+			Log.d(TAG,devices.get(posAvailable).toString());
+			mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable));
 			mBluetoothConnect.start();
-			//mBluetoothConnect.run();
+			
 		}
 		//si lo son
 		else{
-			//mBluetoothConnect.AcceptThread();
-			//mBluetoothConnect.run();
+			int posPaired = mSpinnerPaired.getSelectedItemPosition();
+			//obtiene la lista de dispositivos pareados en forma de device para pasarselo 
+			pairedDevicesArray = (BluetoothDevice[]) mBluetoothAdapter.getBondedDevices().toArray();
+			mBluetoothConnect = new BluetoothConnect(pairedDevicesArray[posPaired]);
+			mBluetoothConnect.start();
+			
 		}
-		
 	}
 	
 
@@ -176,8 +189,9 @@ public class MainBluetooth extends Activity {
 		 lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		 lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
 		 //lIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		 registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-		 //registerReceiver(mReceiver,lIntentFilter);
+		 //registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+		 registerReceiver(mReceiver,lIntentFilter);
+		 mBluetoothConfig.CheckBluetooth(tg_button);
 
 	 }
 	 @Override
@@ -185,8 +199,4 @@ public class MainBluetooth extends Activity {
 		 super.onPause();
 		unregisterReceiver(mReceiver);
     }
-
-	
-
-
 }
