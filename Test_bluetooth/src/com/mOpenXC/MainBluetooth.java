@@ -68,8 +68,6 @@ public class MainBluetooth extends Activity {
 		 //registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		 registerReceiver(mReceiver, lIntentFilter);
 		 
-		 //comprobamos estado bluettoth para dejar el boton en el mismo estado
-			 
 		 
 	}
 
@@ -149,7 +147,7 @@ public class MainBluetooth extends Activity {
 		}
 	};
 	
-	public void ligarDispositivo(View view){
+	public void AvailableConnect(View view){
 		
 		if (devices.size() == 0){
 			Log.i("Lista","ERROR :Lista vacia ");
@@ -159,25 +157,33 @@ public class MainBluetooth extends Activity {
 		if (mBluetoothAdapter.isDiscovering()){
 			mBluetoothAdapter.cancelDiscovery();
 		}
+		
 		int posAvailable = mSpinnerAvailable.getSelectedItemPosition();
 		Log.i("Lista", devices.toString());
 		
-		//if the devices are not  paired
-		if(devices.get(posAvailable).getBondState() == BluetoothDevice.BOND_NONE){
-			Log.d(TAG,devices.get(posAvailable).toString());
-			mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable));
-			mBluetoothConnect.start();
-			
+		
+		Log.d(TAG,devices.get(posAvailable).toString());
+		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable));
+		mBluetoothConnect.start();
+	}
+	
+	public void PairedConnect(View view){
+		
+		if (devices.size() == 0){
+			Log.i("Lista","Lista vacia ");
+			Toast toast = Toast.makeText(getApplicationContext(), "Lista vacia", Toast.LENGTH_SHORT);
+			return;
 		}
-		//si lo son
-		else{
-			int posPaired = mSpinnerPaired.getSelectedItemPosition();
-			//obtiene la lista de dispositivos pareados en forma de device para pasarselo 
-			pairedDevicesArray = (BluetoothDevice[]) mBluetoothAdapter.getBondedDevices().toArray();
-			mBluetoothConnect = new BluetoothConnect(pairedDevicesArray[posPaired]);
-			mBluetoothConnect.start();
 			
+		if (mBluetoothAdapter.isDiscovering()){
+			mBluetoothAdapter.cancelDiscovery();
 		}
+		int posPaired = mSpinnerPaired.getSelectedItemPosition();
+		//obtiene la lista de dispositivos pareados en forma de device para pasarselo 
+		pairedDevicesArray = (BluetoothDevice[]) mBluetoothAdapter.getBondedDevices().toArray();
+		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray[posPaired]);
+		mBluetoothConnect.start();
+		
 	}
 	
 

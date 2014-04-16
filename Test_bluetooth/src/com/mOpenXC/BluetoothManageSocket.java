@@ -1,11 +1,14 @@
 package com.mOpenXC;
 
-	import java.io.IOException;
-	import java.io.InputStream;
-	import java.io.OutputStream;
+	import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 	import android.bluetooth.BluetoothSocket;
-	import android.os.Handler;
+import android.os.Handler;
+import android.util.Log;
 
 	public class BluetoothManageSocket extends Thread{
 		
@@ -14,6 +17,7 @@ package com.mOpenXC;
 	    private OutputStream mmOutStream;
 	    private Handler mHandler;
 		private int MESSAGE_READ;
+		private String json = "";
 	    public BluetoothManageSocket(BluetoothSocket socket) {
 	    	
 	        mmSocket = socket;
@@ -41,8 +45,21 @@ package com.mOpenXC;
 	                // Read from the InputStream
 	            	mmOutStream.write("HELLO".getBytes());
 	                bytes = mmInStream.read(buffer);
+	                try {
+	                    BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream, "iso-8859-1"), 8);
+	                    StringBuilder sb = new StringBuilder();
+	                    String line = null;
+	                    while ((line = reader.readLine()) != null) {
+	                        sb.append(line + "\n");
+	                    }
+	                    mmInStream.close();
+	                    json = sb.toString();
+	                } catch (Exception e) {
+	                    Log.e("Buffer Error", "Error converting result " + e.toString());
+	                }
 	                // Send the obtained bytes to the UI activity
 	                mHandler.obtainMessage(MESSAGE_READ , bytes, -1, buffer).sendToTarget();
+	              
 	            } catch (IOException e) {
 	                break;
 	            }
@@ -62,6 +79,7 @@ package com.mOpenXC;
 	            mmSocket.close();
 	        } catch (IOException e) { }
 	    }
+	    
 	}
 
 

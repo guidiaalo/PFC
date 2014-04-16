@@ -47,16 +47,6 @@
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/ligardisp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/tvTitleListPaired"
-        android:layout_below="@+id/tvTitleListAvailable"
-        android:layout_marginTop="47dp"
-        android:onClick="ligarDispositivo"
-        android:text="Connect!" />
-
     <Spinner
         android:id="@+id/spinnerAvailable"
         android:layout_width="wrap_content"
@@ -64,8 +54,41 @@
         android:layout_alignLeft="@+id/spinnerPaired"
         android:layout_centerVertical="true"
         android:background="#3D393A"
-        android:dropDownSelector="#FFFFFF"
-        android:popupBackground="#FFFFFF" />
+        android:dropDownSelector="#000000"
+        android:popupBackground="#000000" />
+
+    <Spinner
+        android:id="@+id/spinnerPaired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_toRightOf="@+id/tvTitleListPaired"
+        android:background="#3D393A"
+        android:dropDownSelector="#000000"
+        android:popupBackground="#000000" />
+
+    <Button
+        android:id="@+id/bt_Available"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinnerAvailable"
+        android:layout_marginTop="32dp"
+        android:layout_toRightOf="@+id/tvTitleListPaired"
+        android:onClick="AvailableConnect"
+        android:text="Available!"
+        android:textColor="#FFFFFF"
+        android:textAlignment="gravity" />
+
+    <Button
+        android:id="@+id/bt_Paired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/bt_Available"
+        android:layout_alignBottom="@+id/bt_Available"
+        android:layout_alignLeft="@+id/tvTitleListAvailable"
+        android:onClick="PairedConnect"
+        android:textColor="#FFFFFF"
+        android:text="Paired!" />
 
     <TextView
         android:id="@+id/tvTitleListAvailable"
@@ -77,15 +100,5 @@
         android:textAllCaps="true"
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
-
-    <Spinner
-        android:id="@+id/spinnerPaired"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout1"
-        android:layout_toRightOf="@+id/tvTitleListPaired"
-        android:background="#3D393A"
-        android:dropDownSelector="#FFFFFF"
-        android:popupBackground="#FFFFFF" />
 
 </RelativeLayout>
