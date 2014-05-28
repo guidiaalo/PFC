@@ -43,7 +43,8 @@ public class BluetoothConnect extends Thread {
  
     public void run() {
         // Cancel discovery because it will slow down the connection
-        mBluetoothAdapter.cancelDiscovery();
+    	mBluetoothAdapter.cancelDiscovery();    		
+    	
  
         try {
             // Connect the device through the socket. This will block

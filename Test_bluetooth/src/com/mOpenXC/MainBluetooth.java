@@ -1,20 +1,25 @@
 package com.mOpenXC;
 
+import java.net.Socket;
+import java.net.SocketImpl;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -29,13 +34,17 @@ public class MainBluetooth extends Activity {
 	private Spinner mSpinnerPaired;
 	private Spinner mSpinnerAvailable;
 	private ToggleButton tg_button;
+	private BluetoothManageSocket mBluetoothManageSocket;
 	private BluetoothConfig mBluetoothConfig;
 	private BluetoothSearchPaired mBluetoothSearch;
 	private BluetoothConnect mBluetoothConnect;
 	private ArrayList<String> mArrayListAvailable;
 	private ArrayAdapter<String> madapterAvailable;
 	private ArrayList<BluetoothDevice> devices;
-	private BluetoothDevice[] pairedDevicesArray;
+	private ArrayList<BluetoothDevice> pairedDevicesArray;
+	private TextView mTextView;
+	private Handler  mHandler;
+	private BluetoothSocket mSocket;
 
 	@Override
 	//inicializar variables en OnCreate
@@ -43,11 +52,10 @@ public class MainBluetooth extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_bluetooth);
 		
-
 		mSpinnerPaired =(Spinner)findViewById(R.id.spinnerPaired);
 		mSpinnerAvailable = (Spinner)findViewById(R.id.spinnerAvailable);
+		mTextView = (TextView)findViewById(R.id.tv1);
 
-		new ArrayList<String>();
 		mArrayListAvailable = new ArrayList<String>();
 		devices = new ArrayList<BluetoothDevice>();
 	
@@ -59,6 +67,8 @@ public class MainBluetooth extends Activity {
 		mBluetoothAdapter= mBluetoothConfig.getBluetoothAdapter();
 		//inicializo todas las variables, recomendable hacerlo en oncreate
 		mBluetoothSearch = new BluetoothSearchPaired(getApplicationContext(),this,mBluetoothAdapter);
+		
+		mHandler = new Handler();
 
 
 		IntentFilter lIntentFilter = new IntentFilter();
@@ -137,12 +147,7 @@ public class MainBluetooth extends Activity {
 				madapterAvailable = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_spinner_item, mArrayListAvailable);
 				mSpinnerAvailable.setAdapter(madapterAvailable);
 			}
-			//si termina de descubrir dispositivos
-			/*if(action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)){
-				//apaga bluetooth
-				Log.d(TAG, "Discovery finished");
-				//mBluetoothAdapter.cancelDiscovery();
-			}*/
+			
 
 		}
 	};
@@ -169,19 +174,16 @@ public class MainBluetooth extends Activity {
 	
 	public void PairedConnect(View view){
 		
-		if (devices.size() == 0){
-			Log.i("Lista","Lista vacia ");
-			Toast toast = Toast.makeText(getApplicationContext(), "Lista vacia", Toast.LENGTH_SHORT);
-			return;
-		}
 			
 		if (mBluetoothAdapter.isDiscovering()){
 			mBluetoothAdapter.cancelDiscovery();
 		}
 		int posPaired = mSpinnerPaired.getSelectedItemPosition();
+		Log.i(TAG, String.valueOf(posPaired));
 		//obtiene la lista de dispositivos pareados en forma de device para pasarselo 
-		pairedDevicesArray = (BluetoothDevice[]) mBluetoothAdapter.getBondedDevices().toArray();
-		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray[posPaired]);
+		pairedDevicesArray = new ArrayList<BluetoothDevice>(mBluetoothAdapter.getBondedDevices());
+		Log.i(TAG, pairedDevicesArray.toString());
+		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray.get(posPaired));
 		mBluetoothConnect.start();
 		
 	}
@@ -194,7 +196,6 @@ public class MainBluetooth extends Activity {
 		 IntentFilter lIntentFilter = new IntentFilter();
 		 lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		 lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-		 //lIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		 //registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		 registerReceiver(mReceiver,lIntentFilter);
 		 mBluetoothConfig.CheckBluetooth(tg_button);
@@ -205,4 +206,26 @@ public class MainBluetooth extends Activity {
 		 super.onPause();
 		unregisterReceiver(mReceiver);
     }
+	 
+	 public class Atualiza implements Runnable{
+			
+		 private  String mvalue;
+			
+		 public Atualiza (String value){
+				
+			 mvalue = value;			
+				
+		}
+
+		@Override
+		public void run() {
+			mTextView.setText(mvalue);
+				
+		}		
+	}
+	 
+	/*protected void onStop(){
+		super.onStop();
+		mBluetoothManageSocket = new BluetoothManageSocket(mSocket) ;
+	}*/
 }

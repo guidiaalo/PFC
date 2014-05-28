@@ -101,4 +101,26 @@
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bt_Available"
+        android:layout_marginTop="29dp"
+        android:layout_toRightOf="@+id/tvTitleListPaired"
+        android:background="#3D393A"
+        android:text="TextView"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tv1"
+        android:layout_alignBottom="@+id/tv1"
+        android:layout_alignLeft="@+id/bt_Paired"
+        android:background="#3D393A"
+        android:text="Steering wheel angle:"
+        android:textColor="#FFFFFF" />
+
 </RelativeLayout>

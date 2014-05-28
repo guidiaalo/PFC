@@ -6,7 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-	import android.bluetooth.BluetoothSocket;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.mOpenXC.MainBluetooth.Atualiza;
+
+import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.util.Log;
 
@@ -18,12 +23,16 @@ import android.util.Log;
 	    private Handler mHandler;
 		private int MESSAGE_READ;
 		private String json = "";
+		private JSONObject jObj;
+		
+		
+		
 	    public BluetoothManageSocket(BluetoothSocket socket) {
 	    	
 	        mmSocket = socket;
 	        InputStream tmpIn = null;
 	        OutputStream tmpOut = null;
-	 
+	        
 	        // Get the input and output streams, using temp objects because
 	        // member streams are final
 	        try {
@@ -32,54 +41,65 @@ import android.util.Log;
 	        } catch (IOException e) { }
 	 
 	        mmInStream = tmpIn;
-	        mmOutStream = tmpOut;
+	       
+	        
 	    }
 	 
 	    public void run() {
+	    	
 	        byte[] buffer = new byte[1024];  // buffer store for the stream
 	        int bytes; // bytes returned from read()
-	 
+	       // String msg = "iniciando...";
+	        BufferedReader reader;
+            reader = new BufferedReader(new InputStreamReader(mmInStream));
+            String line = null;
+	        StringBuilder sb = new StringBuilder();
 	        // Keep listening to the InputStream until an exception occurs
 	        while (true) {
 	            try {
 	                // Read from the InputStream
-	            	mmOutStream.write("HELLO".getBytes());
-	                bytes = mmInStream.read(buffer);
-	                try {
-	                    BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream, "iso-8859-1"), 8);
-	                    StringBuilder sb = new StringBuilder();
-	                    String line = null;
-	                    while ((line = reader.readLine()) != null) {
-	                        sb.append(line + "\n");
-	                    }
-	                    mmInStream.close();
-	                    json = sb.toString();
-	                } catch (Exception e) {
-	                    Log.e("Buffer Error", "Error converting result " + e.toString());
+	            	
+	            	line = reader.readLine();
+	            	Log.i("tag",line);
+	                sb.append(line + "\n");
+	                json = sb.toString();
+	                jObj = new JSONObject(json);
+	                Log.i("tag", jObj.getString("name"));
+	                if (jObj.getString("name").equals("steering_wheel_angle")) {
+	            	
+	            		mHandler.post(new MainBluetooth().new Atualiza(jObj.getString("value")));
+	            		Log.i("TAG", String.valueOf(jObj.getDouble("value")));	
+	            			        
 	                }
-	                // Send the obtained bytes to the UI activity
-	                mHandler.obtainMessage(MESSAGE_READ , bytes, -1, buffer).sendToTarget();
-	              
 	            } catch (IOException e) {
+	            	try {
+	            		mmInStream.close();
+						mmSocket.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 	                break;
-	            }
+	            } catch (JSONException e) {
+					// TODO Auto-generated catch block
+	            	try {
+	            		mmInStream.close();
+						mmSocket.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					e.printStackTrace();
+				}
 	        }
 	    }
 	 
-	    /* Call this from the main activity to send data to the remote device */
-	    public void write(byte[] bytes) {
-	        try {
-	            mmOutStream.write(bytes);
-	        } catch (IOException e) { }
-	    }
 	 
 	    /* Call this from the main activity to shutdown the connection */
 	    public void cancel() {
 	        try {
+	        	mmInStream.close();
 	            mmSocket.close();
 	        } catch (IOException e) { }
-	    }
-	    
+	    }   
 	}
-
-
