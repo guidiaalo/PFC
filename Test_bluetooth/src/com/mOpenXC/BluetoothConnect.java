@@ -23,6 +23,7 @@ public class BluetoothConnect extends Thread {
 	private BluetoothManageSocket mBluetoothManageSocket;
 	private Atualiza	mAtualiza;
 	private HandlerThread mAtualizadorThread;
+	private UpdateReceiver mUpdateReceiver;
 	/**
 	 * 
 	 * Crea socket conexion para 
@@ -38,6 +39,26 @@ public class BluetoothConnect extends Thread {
         mmDevice = device;
         mAtualiza = aAtualiza;
         mAtualizadorThread = aAtualizadorThread;
+ 
+        // Get a BluetoothSocket to connect with the given BluetoothDevice
+        try {
+            // MY_UUID is the app's UUID string, also used by the server code
+            tmp = device.createRfcommSocketToServiceRecord(UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee"));
+        } catch (IOException e) { Log.e("socket", e.getMessage()); }
+        mmSocket = tmp;
+    }
+    /**
+     * Constructor to use {@link UpdateReceiver} to receive results.
+     * @param device
+     * @param aUpdateReceiver
+     */
+    public BluetoothConnect(BluetoothDevice device,UpdateReceiver aUpdateReceiver) {
+        // Use a temporary object that is later assigned to mmSocket,
+        // because mmSocket is final
+    	mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothSocket tmp = null;
+        mmDevice = device;
+        mUpdateReceiver = aUpdateReceiver;
  
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
@@ -66,7 +87,8 @@ public class BluetoothConnect extends Thread {
         }
  
         // Do work to manage the connection (in a separate thread)
-       mBluetoothManageSocket = new BluetoothManageSocket(mmSocket,mAtualiza, mAtualizadorThread);
+//       mBluetoothManageSocket = new BluetoothManageSocket(mmSocket,mAtualiza, mAtualizadorThread);
+        mBluetoothManageSocket = new BluetoothManageSocket(mmSocket, mUpdateReceiver);
        mBluetoothManageSocket.start();
     }
  

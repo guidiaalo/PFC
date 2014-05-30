@@ -27,7 +27,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
-public class MainBluetooth extends Activity {
+public class MainBluetooth extends Activity implements ITextUpdater {
 	/**
 	 * actividad principal
 	 * 
@@ -51,12 +51,15 @@ public class MainBluetooth extends Activity {
 	private HandlerThread mAtualizadorThread;
 	private Atualiza mAtualiza;
 	private Message mMessage;
+	private UpdateReceiver mUpdateReceiver;
 
 	@Override
 	//inicializar variables en OnCreate
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_bluetooth);
+		
+		mUpdateReceiver = new UpdateReceiver(this);
 		
 		mSpinnerPaired =(Spinner)findViewById(R.id.spinnerPaired);
 		mSpinnerAvailable = (Spinner)findViewById(R.id.spinnerAvailable);
@@ -174,7 +177,8 @@ public class MainBluetooth extends Activity {
 		
 		
 		Log.d(TAG,devices.get(posAvailable).toString());
-		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable),mAtualiza,mAtualizadorThread);
+//		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable),mAtualiza,mAtualizadorThread);
+		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable), mUpdateReceiver);
 		mBluetoothConnect.start();
 	}
 	
@@ -223,6 +227,12 @@ public class MainBluetooth extends Activity {
 				String lUpdatedText = (String) aMessage.obj;
 				mTextView.setText(lUpdatedText);
 			}			
+	}
+
+	@Override
+	public void updateText(String aText) {
+		mTextView.setText(aText);
+		
 	}
 	
 }

@@ -31,6 +31,7 @@ import android.util.Log;
 		private Atualiza	mAtualiza;
 		private HandlerThread mAtualizadorThread;
 		private MainBluetooth mMainBluetooth;
+		private UpdateReceiver mUpdateReceiver;
 		
 		
 	    public BluetoothManageSocket(BluetoothSocket socket, Atualiza aAtualiza, HandlerThread aAtualizadorThread) {
@@ -49,6 +50,27 @@ import android.util.Log;
 	        mmInStream = tmpIn;
 	        mAtualiza = aAtualiza;
 	        mAtualizadorThread = aAtualizadorThread;
+	       
+	        
+	    }
+	    
+	    public BluetoothManageSocket(BluetoothSocket socket, UpdateReceiver aReceiver) {
+	    	
+	        mmSocket = socket;
+	        InputStream tmpIn = null;
+	        OutputStream tmpOut = null;
+	        
+	        // Get the input and output streams, using temp objects because
+	        // member streams are final
+	        try {
+	            tmpIn = socket.getInputStream();
+	            tmpOut = socket.getOutputStream();
+	        } catch (IOException e) { }
+	 
+	        mmInStream = tmpIn;
+//	        mAtualiza = aAtualiza;
+//	        mAtualizadorThread = aAtualizadorThread;
+	        mUpdateReceiver = aReceiver;
 	       
 	        
 	    }
@@ -77,9 +99,12 @@ import android.util.Log;
                 	
 	                if (jObj.getString("name").equals("steering_wheel_angle")) {
 	                		
-	                	mMessage = mAtualiza.obtainMessage();
-	                	mMessage.obj = jObj.get("value");
-	                	mAtualiza.sendMessage(mMessage);
+//	                	mMessage = mAtualiza.obtainMessage();
+//	                	mMessage.obj = jObj.get("value");
+//	                	mAtualiza.sendMessage(mMessage);
+	                	Bundle lBundle = new Bundle();
+	                	lBundle.putString(UpdateReceiver.UPDATE_TEXT, (String) jObj.get("value"));
+	                	mUpdateReceiver.send(UpdateReceiver.UPDATE_RESULT_CODE, lBundle);
 	            		//mHandler.post(new MainBluetooth().new Atualiza(jObj.getString("value")));
 	            		Log.i("TAG", String.valueOf(jObj.getDouble("value")));	
 	            			        
