@@ -14,6 +14,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -45,6 +48,9 @@ public class MainBluetooth extends Activity {
 	private TextView mTextView;
 	private Handler  mHandler;
 	private BluetoothSocket mSocket;
+	private HandlerThread mAtualizadorThread;
+	private Atualiza mAtualiza;
+	private Message mMessage;
 
 	@Override
 	//inicializar variables en OnCreate
@@ -68,15 +74,15 @@ public class MainBluetooth extends Activity {
 		//inicializo todas las variables, recomendable hacerlo en oncreate
 		mBluetoothSearch = new BluetoothSearchPaired(getApplicationContext(),this,mBluetoothAdapter);
 		
-		mHandler = new Handler();
+		mAtualizadorThread = new HandlerThread("mHandlerThread");
+		mAtualizadorThread.start();
+		mAtualiza = new Atualiza (mAtualizadorThread.getLooper());
 
 
 		IntentFilter lIntentFilter = new IntentFilter();
-		 lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-		 lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-		 //lIntentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		 //registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-		 registerReceiver(mReceiver, lIntentFilter);
+		lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+		lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+		registerReceiver(mReceiver, lIntentFilter);
 		 
 		 
 	}
@@ -168,7 +174,7 @@ public class MainBluetooth extends Activity {
 		
 		
 		Log.d(TAG,devices.get(posAvailable).toString());
-		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable));
+		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable),mAtualiza,mAtualizadorThread);
 		mBluetoothConnect.start();
 	}
 	
@@ -183,7 +189,7 @@ public class MainBluetooth extends Activity {
 		//obtiene la lista de dispositivos pareados en forma de device para pasarselo 
 		pairedDevicesArray = new ArrayList<BluetoothDevice>(mBluetoothAdapter.getBondedDevices());
 		Log.i(TAG, pairedDevicesArray.toString());
-		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray.get(posPaired));
+		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray.get(posPaired),mAtualiza,mAtualizadorThread);
 		mBluetoothConnect.start();
 		
 	}
@@ -196,7 +202,6 @@ public class MainBluetooth extends Activity {
 		 IntentFilter lIntentFilter = new IntentFilter();
 		 lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		 lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-		 //registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		 registerReceiver(mReceiver,lIntentFilter);
 		 mBluetoothConfig.CheckBluetooth(tg_button);
 
@@ -207,25 +212,17 @@ public class MainBluetooth extends Activity {
 		unregisterReceiver(mReceiver);
     }
 	 
-	 public class Atualiza implements Runnable{
+	 public class Atualiza extends Handler {
 			
-		 private  String mvalue;
-			
-		 public Atualiza (String value){
-				
-			 mvalue = value;			
-				
-		}
+		 public Atualiza(final Looper aLooper) {
+				super(aLooper);
+			}
 
-		@Override
-		public void run() {
-			mTextView.setText(mvalue);
-				
-		}		
+			@Override
+			public void handleMessage(Message aMessage) {
+				String lUpdatedText = (String) aMessage.obj;
+				mTextView.setText(lUpdatedText);
+			}			
 	}
-	 
-	/*protected void onStop(){
-		super.onStop();
-		mBluetoothManageSocket = new BluetoothManageSocket(mSocket) ;
-	}*/
+	
 }

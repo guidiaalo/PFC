@@ -12,7 +12,10 @@ import org.json.JSONObject;
 import com.mOpenXC.MainBluetooth.Atualiza;
 
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Log;
 
 	public class BluetoothManageSocket extends Thread{
@@ -24,10 +27,13 @@ import android.util.Log;
 		private int MESSAGE_READ;
 		private String json = "";
 		private JSONObject jObj;
+		private Message mMessage;
+		private Atualiza	mAtualiza;
+		private HandlerThread mAtualizadorThread;
+		private MainBluetooth mMainBluetooth;
 		
 		
-		
-	    public BluetoothManageSocket(BluetoothSocket socket) {
+	    public BluetoothManageSocket(BluetoothSocket socket, Atualiza aAtualiza, HandlerThread aAtualizadorThread) {
 	    	
 	        mmSocket = socket;
 	        InputStream tmpIn = null;
@@ -41,6 +47,8 @@ import android.util.Log;
 	        } catch (IOException e) { }
 	 
 	        mmInStream = tmpIn;
+	        mAtualiza = aAtualiza;
+	        mAtualizadorThread = aAtualizadorThread;
 	       
 	        
 	    }
@@ -65,9 +73,14 @@ import android.util.Log;
 	                json = sb.toString();
 	                jObj = new JSONObject(json);
 	                Log.i("tag", jObj.getString("name"));
+	                
+                	
 	                if (jObj.getString("name").equals("steering_wheel_angle")) {
-	            	
-	            		mHandler.post(new MainBluetooth().new Atualiza(jObj.getString("value")));
+	                		
+	                	mMessage = mAtualiza.obtainMessage();
+	                	mMessage.obj = jObj.get("value");
+	                	mAtualiza.sendMessage(mMessage);
+	            		//mHandler.post(new MainBluetooth().new Atualiza(jObj.getString("value")));
 	            		Log.i("TAG", String.valueOf(jObj.getDouble("value")));	
 	            			        
 	                }

@@ -3,9 +3,12 @@ package com.mOpenXC;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.mOpenXC.MainBluetooth.Atualiza;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.HandlerThread;
 import android.util.Log;
 
 
@@ -18,7 +21,8 @@ public class BluetoothConnect extends Thread {
 	private BluetoothDevice mmDevice;
 	private BluetoothSocket mmSocket;
 	private BluetoothManageSocket mBluetoothManageSocket;
-
+	private Atualiza	mAtualiza;
+	private HandlerThread mAtualizadorThread;
 	/**
 	 * 
 	 * Crea socket conexion para 
@@ -26,12 +30,14 @@ public class BluetoothConnect extends Thread {
 	 * @return 
 	 * @return 
 	 */
-    public BluetoothConnect(BluetoothDevice device) {
+    public BluetoothConnect(BluetoothDevice device,Atualiza aAtualiza, HandlerThread aAtualizadorThread) {
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
     	mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         BluetoothSocket tmp = null;
         mmDevice = device;
+        mAtualiza = aAtualiza;
+        mAtualizadorThread = aAtualizadorThread;
  
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
@@ -60,7 +66,7 @@ public class BluetoothConnect extends Thread {
         }
  
         // Do work to manage the connection (in a separate thread)
-       mBluetoothManageSocket = new BluetoothManageSocket(mmSocket);
+       mBluetoothManageSocket = new BluetoothManageSocket(mmSocket,mAtualiza, mAtualizadorThread);
        mBluetoothManageSocket.start();
     }
  
