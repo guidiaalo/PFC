@@ -6,12 +6,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mOpenXC.MainBluetooth.Atualiza;
 
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -28,49 +31,19 @@ import android.util.Log;
 		private String json = "";
 		private JSONObject jObj;
 		private Message mMessage;
-		private Atualiza	mAtualiza;
-		private HandlerThread mAtualizadorThread;
 		private MainBluetooth mMainBluetooth;
-		private UpdateReceiver mUpdateReceiver;
-		
-		
-	    public BluetoothManageSocket(BluetoothSocket socket, Atualiza aAtualiza, HandlerThread aAtualizadorThread) {
+		public BluetoothManageSocket(BluetoothSocket socket, Atualiza aAtualiza, HandlerThread aAtualizadorThread, MainBluetooth aMainBluetooth) {
 	    	
 	        mmSocket = socket;
 	        InputStream tmpIn = null;
-	        OutputStream tmpOut = null;
-	        
 	        // Get the input and output streams, using temp objects because
 	        // member streams are final
 	        try {
 	            tmpIn = socket.getInputStream();
-	            tmpOut = socket.getOutputStream();
 	        } catch (IOException e) { }
 	 
 	        mmInStream = tmpIn;
-	        mAtualiza = aAtualiza;
-	        mAtualizadorThread = aAtualizadorThread;
-	       
-	        
-	    }
-	    
-	    public BluetoothManageSocket(BluetoothSocket socket, UpdateReceiver aReceiver) {
-	    	
-	        mmSocket = socket;
-	        InputStream tmpIn = null;
-	        OutputStream tmpOut = null;
-	        
-	        // Get the input and output streams, using temp objects because
-	        // member streams are final
-	        try {
-	            tmpIn = socket.getInputStream();
-	            tmpOut = socket.getOutputStream();
-	        } catch (IOException e) { }
-	 
-	        mmInStream = tmpIn;
-//	        mAtualiza = aAtualiza;
-//	        mAtualizadorThread = aAtualizadorThread;
-	        mUpdateReceiver = aReceiver;
+	        mMainBluetooth = aMainBluetooth;
 	       
 	        
 	    }
@@ -83,32 +56,29 @@ import android.util.Log;
 	        BufferedReader reader;
             reader = new BufferedReader(new InputStreamReader(mmInStream));
             String line = null;
-	        StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 	        // Keep listening to the InputStream until an exception occurs
+                            
 	        while (true) {
 	            try {
 	                // Read from the InputStream
-	            	
+	            	sb.setLength(0);
 	            	line = reader.readLine();
-	            	Log.i("tag",line);
-	                sb.append(line + "\n");
-	                json = sb.toString();
-	                jObj = new JSONObject(json);
-	                Log.i("tag", jObj.getString("name"));
-	                
-                	
-	                if (jObj.getString("name").equals("steering_wheel_angle")) {
-	                		
-//	                	mMessage = mAtualiza.obtainMessage();
-//	                	mMessage.obj = jObj.get("value");
-//	                	mAtualiza.sendMessage(mMessage);
-	                	Bundle lBundle = new Bundle();
-	                	lBundle.putString(UpdateReceiver.UPDATE_TEXT, (String) jObj.get("value"));
-	                	mUpdateReceiver.send(UpdateReceiver.UPDATE_RESULT_CODE, lBundle);
-	            		//mHandler.post(new MainBluetooth().new Atualiza(jObj.getString("value")));
-	            		Log.i("TAG", String.valueOf(jObj.getDouble("value")));	
-	            			        
+	            	Log.i("TAG", line);
+	            	
+	                sb.append(line + "\n");	
+	                json = sb.toString(); 
+	                Log.i("json", json);
+	                jObj = new JSONObject(json); 
+	                //Log.i("tag", jObj.getString("name"));
+	                                                  	
+	                if (jObj.getString("name").equals("engine_speed")) {
+	                	//Log.i("TAG", String.valueOf(jObj.getDouble("value")));		
+	            		mMainBluetooth.Actualiza(String.valueOf(jObj.getDouble("value")));
+	            		//mSinais.Actualiza1(String.valueOf(jObj.getDouble("value")));
+	            			            			        
 	                }
+	                
 	            } catch (IOException e) {
 	            	try {
 	            		mmInStream.close();
@@ -120,13 +90,13 @@ import android.util.Log;
 	                break;
 	            } catch (JSONException e) {
 					// TODO Auto-generated catch block
-	            	try {
+	            	/*try {
 	            		mmInStream.close();
 						mmSocket.close();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}
+					}*/
 					e.printStackTrace();
 				}
 	        }

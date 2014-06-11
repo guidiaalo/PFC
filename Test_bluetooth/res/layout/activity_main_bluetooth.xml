@@ -65,7 +65,7 @@
         android:layout_toRightOf="@+id/tvTitleListPaired"
         android:background="#3D393A"
         android:dropDownSelector="#000000"
-        android:popupBackground="#000000" />
+        android:popupBackground="#FFFFFF" />
 
     <Button
         android:id="@+id/bt_Available"
@@ -120,7 +120,17 @@
         android:layout_alignBottom="@+id/tv1"
         android:layout_alignLeft="@+id/bt_Paired"
         android:background="#3D393A"
-        android:text="Steering wheel angle:"
+        android:text="Engine Speed:"
         android:textColor="#FFFFFF" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textColor="#FFFFFF"
+        android:layout_alignRight="@+id/tvTitleListPaired"
+        android:text="Ver Sinais"
+        android:onClick="SecondActivity" />
 
 </RelativeLayout>

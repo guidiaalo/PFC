@@ -1,13 +1,11 @@
 package com.mOpenXC;
 
-import java.net.Socket;
-import java.net.SocketImpl;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +13,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -27,7 +23,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
-public class MainBluetooth extends Activity implements ITextUpdater {
+public class MainBluetooth extends Activity {
 	/**
 	 * actividad principal
 	 * 
@@ -37,7 +33,6 @@ public class MainBluetooth extends Activity implements ITextUpdater {
 	private Spinner mSpinnerPaired;
 	private Spinner mSpinnerAvailable;
 	private ToggleButton tg_button;
-	private BluetoothManageSocket mBluetoothManageSocket;
 	private BluetoothConfig mBluetoothConfig;
 	private BluetoothSearchPaired mBluetoothSearch;
 	private BluetoothConnect mBluetoothConnect;
@@ -47,19 +42,17 @@ public class MainBluetooth extends Activity implements ITextUpdater {
 	private ArrayList<BluetoothDevice> pairedDevicesArray;
 	private TextView mTextView;
 	private Handler  mHandler;
-	private BluetoothSocket mSocket;
 	private HandlerThread mAtualizadorThread;
 	private Atualiza mAtualiza;
-	private Message mMessage;
-	private UpdateReceiver mUpdateReceiver;
+	private String dados;
+	private Intent intent;
+	
 
 	@Override
 	//inicializar variables en OnCreate
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_bluetooth);
-		
-		mUpdateReceiver = new UpdateReceiver(this);
 		
 		mSpinnerPaired =(Spinner)findViewById(R.id.spinnerPaired);
 		mSpinnerAvailable = (Spinner)findViewById(R.id.spinnerAvailable);
@@ -77,19 +70,29 @@ public class MainBluetooth extends Activity implements ITextUpdater {
 		//inicializo todas las variables, recomendable hacerlo en oncreate
 		mBluetoothSearch = new BluetoothSearchPaired(getApplicationContext(),this,mBluetoothAdapter);
 		
-		mAtualizadorThread = new HandlerThread("mHandlerThread");
-		mAtualizadorThread.start();
-		mAtualiza = new Atualiza (mAtualizadorThread.getLooper());
-
+		mHandler = new Handler();
+		
+		intent = new Intent("com.mOpenXC.action.Sinais.RECEIVESINAIS");
 
 		IntentFilter lIntentFilter = new IntentFilter();
 		lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		lIntentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-		registerReceiver(mReceiver, lIntentFilter);
-		 
-		 
+		registerReceiver(mReceiver, lIntentFilter);	 
 	}
+	
 
+	public void Actualiza (String value){
+		
+		mHandler.post(new Atualiza(value));
+		
+		intent.putExtra("dados", value);
+        sendBroadcast(intent);
+		//dados = value;
+		
+		
+	}
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -177,8 +180,7 @@ public class MainBluetooth extends Activity implements ITextUpdater {
 		
 		
 		Log.d(TAG,devices.get(posAvailable).toString());
-//		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable),mAtualiza,mAtualizadorThread);
-		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable), mUpdateReceiver);
+		mBluetoothConnect = new BluetoothConnect(devices.get(posAvailable),mAtualiza,mAtualizadorThread,this);
 		mBluetoothConnect.start();
 	}
 	
@@ -193,9 +195,16 @@ public class MainBluetooth extends Activity implements ITextUpdater {
 		//obtiene la lista de dispositivos pareados en forma de device para pasarselo 
 		pairedDevicesArray = new ArrayList<BluetoothDevice>(mBluetoothAdapter.getBondedDevices());
 		Log.i(TAG, pairedDevicesArray.toString());
-		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray.get(posPaired),mAtualiza,mAtualizadorThread);
+		mBluetoothConnect = new BluetoothConnect(pairedDevicesArray.get(posPaired),mAtualiza,mAtualizadorThread,this);
 		mBluetoothConnect.start();
 		
+	}
+
+	//LLama a la segunda Actividad para mostrar se–ales
+	public void SecondActivity (View view){
+		
+		Intent i = new Intent(this,Sinais.class);
+		this.startActivity(i);
 	}
 	
 
@@ -216,23 +225,20 @@ public class MainBluetooth extends Activity implements ITextUpdater {
 		unregisterReceiver(mReceiver);
     }
 	 
-	 public class Atualiza extends Handler {
+	 public class Atualiza implements Runnable {
+		 
+		private String mString;
+		public Atualiza (String aString){
 			
-		 public Atualiza(final Looper aLooper) {
-				super(aLooper);
-			}
-
-			@Override
-			public void handleMessage(Message aMessage) {
-				String lUpdatedText = (String) aMessage.obj;
-				mTextView.setText(lUpdatedText);
-			}			
+			mString = aString;
+		}
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			mTextView.setText(mString);
+		}				
 	}
-
-	@Override
-	public void updateText(String aText) {
-		mTextView.setText(aText);
-		
-	}
+	 
+	 
 	
 }
