@@ -72,7 +72,7 @@ public class MainBluetooth extends Activity {
 		
 		mHandler = new Handler();
 		
-		intent = new Intent("com.mOpenXC.action.Sinais.RECEIVESINAIS");
+		
 
 		IntentFilter lIntentFilter = new IntentFilter();
 		lIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -85,7 +85,8 @@ public class MainBluetooth extends Activity {
 		
 		mHandler.post(new Atualiza(value));
 		
-		intent.putExtra("dados", value);
+		intent = new Intent("com.mOpenXC.action.Sinais.RECEIVESINAIS");
+		
         sendBroadcast(intent);
 		//dados = value;
 		
